@@ -20,8 +20,8 @@ const Navbar = async () => {
         <div className='flex h-14 items-center justify-between border-b border-zinc-200'>
           <Link
             href='/'
-            className='flex z-40 font-semibold'>
-            <span>NeuroSage.</span>
+            className='nav-brand'>
+            NeuroSage
           </Link>
 
           <MobileNav isAuth={!!user} />
@@ -33,12 +33,14 @@ const Navbar = async () => {
                   className={buttonVariants({
                     variant: 'ghost',
                     size: 'sm',
+                    className: 'nav-item',
                   })}>
                   Sign in
                 </LoginLink>
                 <RegisterLink
                   className={buttonVariants({
                     size: 'sm',
+                    className: 'nav-item',
                   })}>
                   Get started{' '}
                   <ArrowRight className='ml-1.5 h-5 w-5' />
@@ -51,6 +53,7 @@ const Navbar = async () => {
                   className={buttonVariants({
                     variant: 'ghost',
                     size: 'sm',
+                    className: 'nav-item',
                   })}>
                   Dashboard
                 </Link>
