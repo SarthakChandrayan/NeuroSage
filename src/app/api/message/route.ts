@@ -4,9 +4,7 @@ import { getPineconeClient } from '@/lib/pinecone'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { NextRequest } from 'next/server'
-
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 
 export const POST = async (req: NextRequest) => {
@@ -49,21 +47,44 @@ export const POST = async (req: NextRequest) => {
     openAIApiKey: process.env.OPENAI_API_KEY,
   })
 
-  const pinecone = await getPineconeClient()
-  const pineconeIndex = pinecone.Index('quill')
+  const pinecone = getPineconeClient()
+  const index = pinecone.index('neurosage')
 
-  const vectorStore = await PineconeStore.fromExistingIndex(
-    embeddings,
-    {
-      pineconeIndex,
-      namespace: file.id,
+  // Get message embedding
+  const messageEmbedding = await embeddings.embedQuery(message)
+
+  console.log('Querying Pinecone for file:', {
+    fileId: file.id,
+    message: message.slice(0, 100)
+  })
+
+  // Query Pinecone directly
+  const queryResponse = await index.query({
+    vector: messageEmbedding,
+    topK: 4,
+    includeMetadata: true,
+    filter: {
+      fileId: { $eq: file.id }
     }
-  )
+  })
 
-  const results = await vectorStore.similaritySearch(
-    message,
-    4
-  )
+  console.log('Pinecone query response:', {
+    matchCount: queryResponse.matches.length,
+    firstMatch: queryResponse.matches[0] ? {
+      score: queryResponse.matches[0].score,
+      metadata: queryResponse.matches[0].metadata
+    } : 'No matches'
+  })
+
+  // Format results
+  const results = queryResponse.matches.map(match => ({
+    pageContent: match.metadata?.text ?? '',
+    metadata: match.metadata
+  }))
+
+  if (results.length === 0) {
+    console.log('No results found in Pinecone for fileId:', file.id)
+  }
 
   const prevMessages = await db.message.findMany({
     where: {
@@ -115,7 +136,7 @@ export const POST = async (req: NextRequest) => {
     ],
   })
 
-  const stream = OpenAIStream(response, {
+  const stream = OpenAIStream(response as any, {
     async onCompletion(completion) {
       await db.message.create({
         data: {

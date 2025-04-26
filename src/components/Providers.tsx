@@ -10,12 +10,28 @@ import { httpBatchLink } from '@trpc/client'
 import { PropsWithChildren, useState } from 'react'
 
 const Providers = ({ children }: PropsWithChildren) => {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: 3,
+      },
+      mutations: {
+        retry: 3,
+      },
+    },
+  }))
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: absoluteUrl("/api/trpc"),
+          url: absoluteUrl('/api/trpc'),
+          headers() {
+            return {
+              'x-trpc-source': 'react',
+            }
+          },
         }),
       ],
     })

@@ -5,41 +5,39 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogTitle,
+  DialogDescription,
 } from './ui/dialog'
 import { Button } from './ui/button'
 
 import Dropzone from 'react-dropzone'
-import { Cloud, File, Loader2 } from 'lucide-react'
+import { Cloud, File, Loader2, Check } from 'lucide-react'
 import { Progress } from './ui/progress'
 import { useUploadThing } from '@/lib/uploadthing'
 import { useToast } from './ui/use-toast'
 import { trpc } from '@/app/_trpc/client'
 import { useRouter } from 'next/navigation'
 
-const UploadDropzone = ({
-  isSubscribed,
-}: {
-  isSubscribed: boolean
-}) => {
+const UploadDropzone = () => {
   const router = useRouter()
 
-  const [isUploading, setIsUploading] =
-    useState<boolean>(false)
-  const [uploadProgress, setUploadProgress] =
-    useState<number>(0)
+  const [isUploading, setIsUploading] = useState<boolean>(false)
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
   const { toast } = useToast()
 
-  const { startUpload } = useUploadThing(
-    isSubscribed ? 'proPlanUploader' : 'freePlanUploader'
-  )
+  const { startUpload } = useUploadThing('pdfUploader')
 
-  const { mutate: startPolling } = trpc.getFile.useMutation(
+  const [fileKey, setFileKey] = useState<string>('')
+
+  const { data: file } = trpc.getFile.useQuery(
+    { key: fileKey },
     {
+      enabled: fileKey.length > 0,
       onSuccess: (file) => {
         router.push(`/dashboard/${file.id}`)
       },
       retry: true,
-      retryDelay: 500,
+      retryDelay: 500
     }
   )
 
@@ -93,7 +91,7 @@ const UploadDropzone = ({
         clearInterval(progressInterval)
         setUploadProgress(100)
 
-        startPolling({ key })
+        setFileKey(key)
       }}>
       {({ getRootProps, getInputProps, acceptedFiles }) => (
         <div
@@ -112,7 +110,7 @@ const UploadDropzone = ({
                   or drag and drop
                 </p>
                 <p className='text-xs text-zinc-500'>
-                  PDF (up to {isSubscribed ? "16" : "4"}MB)
+                  PDF (up to 16MB)
                 </p>
               </div>
 
@@ -127,25 +125,26 @@ const UploadDropzone = ({
                 </div>
               ) : null}
 
-              {isUploading ? (
-                <div className='w-full mt-4 max-w-xs mx-auto'>
-                  <Progress
-                    indicatorColor={
-                      uploadProgress === 100
-                        ? 'bg-green-500'
-                        : ''
-                    }
-                    value={uploadProgress}
-                    className='h-1 w-full bg-zinc-200'
+              {isUploading && (
+                <div className="w-full mt-4 max-w-xs mx-auto">
+                  <Progress 
+                    indicatorColor="bg-green-500" 
+                    value={uploadProgress} 
+                    className="h-1 w-full bg-zinc-200" 
                   />
-                  {uploadProgress === 100 ? (
-                    <div className='flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2'>
-                      <Loader2 className='h-3 w-3 animate-spin' />
-                      Redirecting...
+                  {uploadProgress < 100 ? (
+                    <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Uploading...
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                      <Check className="h-3 w-3" />
+                      Upload complete!
+                    </div>
+                  )}
                 </div>
-              ) : null}
+              )}
 
               <input
                 {...getInputProps()}
@@ -161,11 +160,7 @@ const UploadDropzone = ({
   )
 }
 
-const UploadButton = ({
-  isSubscribed,
-}: {
-  isSubscribed: boolean
-}) => {
+const UploadButton = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   return (
@@ -182,8 +177,12 @@ const UploadButton = ({
         <Button>Upload PDF</Button>
       </DialogTrigger>
 
-      <DialogContent>
-        <UploadDropzone isSubscribed={isSubscribed} />
+      <DialogContent className="sm:max-w-[480px] p-0">
+        <DialogTitle className="sr-only">Upload PDF</DialogTitle>
+        <DialogDescription className="sr-only">
+          Upload your PDF file for processing
+        </DialogDescription>
+        <UploadDropzone />
       </DialogContent>
     </Dialog>
   )

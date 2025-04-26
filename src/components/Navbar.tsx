@@ -10,9 +10,9 @@ import { ArrowRight } from 'lucide-react'
 import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
 
-const Navbar = () => {
+const Navbar = async () => {
   const { getUser } = getKindeServerSession()
-  const user = getUser()
+  const user = await getUser()
 
   return (
     <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all'>
@@ -21,7 +21,7 @@ const Navbar = () => {
           <Link
             href='/'
             className='flex z-40 font-semibold'>
-            <span>quill.</span>
+            <span>NeuroSage.</span>
           </Link>
 
           <MobileNav isAuth={!!user} />
@@ -29,14 +29,6 @@ const Navbar = () => {
           <div className='hidden items-center space-x-4 sm:flex'>
             {!user ? (
               <>
-                <Link
-                  href='/pricing'
-                  className={buttonVariants({
-                    variant: 'ghost',
-                    size: 'sm',
-                  })}>
-                  Pricing
-                </Link>
                 <LoginLink
                   className={buttonVariants({
                     variant: 'ghost',

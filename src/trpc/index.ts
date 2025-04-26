@@ -9,16 +9,11 @@ import { db } from '@/db'
 import { z } from 'zod'
 import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query'
 import { absoluteUrl } from '@/lib/utils'
-import {
-  getUserSubscriptionPlan,
-  stripe,
-} from '@/lib/stripe'
-import { PLANS } from '@/config/stripe'
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession()
-    const user = getUser()
+    const user = await getUser()
 
     if (!user.id || !user.email)
       throw new TRPCError({ code: 'UNAUTHORIZED' })
@@ -51,64 +46,6 @@ export const appRouter = router({
       },
     })
   }),
-
-  createStripeSession: privateProcedure.mutation(
-    async ({ ctx }) => {
-      const { userId } = ctx
-
-      const billingUrl = absoluteUrl('/dashboard/billing')
-
-      if (!userId)
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-      const dbUser = await db.user.findFirst({
-        where: {
-          id: userId,
-        },
-      })
-
-      if (!dbUser)
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-      const subscriptionPlan =
-        await getUserSubscriptionPlan()
-
-      if (
-        subscriptionPlan.isSubscribed &&
-        dbUser.stripeCustomerId
-      ) {
-        const stripeSession =
-          await stripe.billingPortal.sessions.create({
-            customer: dbUser.stripeCustomerId,
-            return_url: billingUrl,
-          })
-
-        return { url: stripeSession.url }
-      }
-
-      const stripeSession =
-        await stripe.checkout.sessions.create({
-          success_url: billingUrl,
-          cancel_url: billingUrl,
-          payment_method_types: ['card', 'paypal'],
-          mode: 'subscription',
-          billing_address_collection: 'auto',
-          line_items: [
-            {
-              price: PLANS.find(
-                (plan) => plan.name === 'Pro'
-              )?.price.priceIds.test,
-              quantity: 1,
-            },
-          ],
-          metadata: {
-            userId: userId,
-          },
-        })
-
-      return { url: stripeSession.url }
-    }
-  ),
 
   getFileMessages: privateProcedure
     .input(
@@ -176,21 +113,33 @@ export const appRouter = router({
       return { status: file.uploadStatus }
     }),
 
-  getFile: privateProcedure
+  getFile: publicProcedure
     .input(z.object({ key: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx
+    .query(async ({ ctx, input }) => {
+      console.log('getFile procedure called with key:', input.key)
+      
+      try {
+        const file = await db.file.findFirst({
+          where: {
+            key: input.key,
+          },
+        })
 
-      const file = await db.file.findFirst({
-        where: {
-          key: input.key,
-          userId,
-        },
-      })
+        console.log('File found:', file)
 
-      if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
+        if (!file) {
+          console.log('File not found')
+          throw new TRPCError({ 
+            code: 'NOT_FOUND',
+            message: 'File not found in database'
+          })
+        }
 
-      return file
+        return file
+      } catch (error) {
+        console.error('Error in getFile procedure:', error)
+        throw error
+      }
     }),
 
   deleteFile: privateProcedure

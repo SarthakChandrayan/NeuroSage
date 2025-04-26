@@ -20,25 +20,25 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
         })}>
         <div
           className={cn(
-            'relative flex h-6 w-6 aspect-square items-center justify-center',
+            'relative flex h-8 w-8 aspect-square items-center justify-center',
             {
-              'order-2 bg-blue-600 rounded-sm':
+              'order-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-lg':
                 message.isUserMessage,
-              'order-1 bg-zinc-800 rounded-sm':
+              'order-1 bg-gradient-to-br from-gray-900 to-gray-800 rounded-full shadow-lg':
                 !message.isUserMessage,
-              invisible: isNextMessageSamePerson,
+              'opacity-0': isNextMessageSamePerson,
             }
           )}>
           {message.isUserMessage ? (
-            <Icons.user className='fill-zinc-200 text-zinc-200 h-3/4 w-3/4' />
+            <Icons.user className='fill-white text-white h-4 w-4' />
           ) : (
-            <Icons.logo className='fill-zinc-300 h-3/4 w-3/4' />
+            <Icons.logo className='fill-white h-5 w-5' />
           )}
         </div>
 
         <div
           className={cn(
-            'flex flex-col space-y-2 text-base max-w-md mx-2',
+            'flex flex-col space-y-2 text-base max-w-md mx-3',
             {
               'order-1 items-end': message.isUserMessage,
               'order-2 items-start': !message.isUserMessage,
@@ -46,24 +46,27 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
           )}>
           <div
             className={cn(
-              'px-4 py-2 rounded-lg inline-block',
+              'px-4 py-2 rounded-2xl inline-block shadow-md transition-all duration-200',
               {
-                'bg-blue-600 text-white':
+                'bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg':
                   message.isUserMessage,
-                'bg-gray-200 text-gray-900':
+                'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:shadow-lg':
                   !message.isUserMessage,
-                'rounded-br-none':
+                'rounded-br-lg':
                   !isNextMessageSamePerson &&
                   message.isUserMessage,
-                'rounded-bl-none':
+                'rounded-bl-lg':
                   !isNextMessageSamePerson &&
                   !message.isUserMessage,
               }
             )}>
             {typeof message.text === 'string' ? (
               <ReactMarkdown
-                className={cn('prose', {
-                  'text-zinc-50': message.isUserMessage,
+                className={cn('prose max-w-none', {
+                  'text-zinc-50 prose-headings:text-zinc-50 prose-p:text-zinc-50 prose-strong:text-zinc-50': 
+                    message.isUserMessage,
+                  'prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-800 dark:prose-p:text-gray-200':
+                    !message.isUserMessage
                 })}>
                 {message.text}
               </ReactMarkdown>
@@ -73,10 +76,10 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
             {message.id !== 'loading-message' ? (
               <div
                 className={cn(
-                  'text-xs select-none mt-2 w-full text-right',
+                  'text-xs select-none mt-2 w-full text-right font-medium',
                   {
-                    'text-zinc-500': !message.isUserMessage,
-                    'text-blue-300': message.isUserMessage,
+                    'text-gray-200 dark:text-gray-400': !message.isUserMessage,
+                    'text-indigo-100': message.isUserMessage,
                   }
                 )}>
                 {format(
