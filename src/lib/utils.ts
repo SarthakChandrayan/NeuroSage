@@ -19,13 +19,17 @@ export function constructMetadata({
   title = "NeuroSage - AI-Powered PDF Analysis",
   description = "NeuroSage is an intelligent platform for analyzing and chatting with your PDF files.",
   image = "/thumbnail.png",
-  icons = "/favicon.ico",
+  icons = {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
   noIndex = false
 }: {
   title?: string
   description?: string
   image?: string
-  icons?: string
+  icons?: any
   noIndex?: boolean
 } = {}): Metadata {
   return {

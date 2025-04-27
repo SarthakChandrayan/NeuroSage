@@ -12,15 +12,17 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { Metric, Text, Title, AreaChart } from '@tremor/react'
 import { Ghost, MessageSquare } from 'lucide-react'
 import { format } from 'date-fns'
+import { type ExtendedMessage } from '@/types/message'
 
 const Analytics = () => {
   const { data: files } = trpc.getUserFiles.useQuery()
-  const { data: messages } = trpc.getFileMessages.useQuery(
-    files?.[0]?.id ?? ''
-  )
+  const { data: messages } = trpc.getFileMessages.useQuery({
+    fileId: files?.[0]?.id ?? '',
+    limit: 100,
+  })
 
   // Prepare data for charts
-  const messagesByDate = messages?.reduce((acc: any, message) => {
+  const messagesByDate = messages?.messages?.reduce((acc: Record<string, number>, message: ExtendedMessage) => {
     const date = format(new Date(message.createdAt), 'MMM dd')
     if (!acc[date]) {
       acc[date] = 0
@@ -80,7 +82,7 @@ const Analytics = () => {
               <MessageSquare className='h-8 w-8 text-zinc-800' />
               <div className='flex flex-col'>
                 <Text>Total Messages</Text>
-                <Metric>{messages?.length || 0}</Metric>
+                <Metric>{messages?.messages?.length || 0}</Metric>
               </div>
             </div>
 

@@ -26,103 +26,65 @@ const onUploadComplete = async ({
   metadata,
   file,
 }: {
-  metadata: Awaited<ReturnType<typeof middleware>>
+  metadata: { userId: string }
   file: {
     key: string
     name: string
     url: string
   }
 }) => {
-  const isFileExist = await db.file.findFirst({
-    where: {
-      key: file.key,
-    },
-  })
-
-  if (isFileExist) return
-
-  const createdFile = await db.file.create({
-    data: {
-      key: file.key,
-      name: file.name,
-      userId: metadata.userId,
-      url: file.url,
-      uploadStatus: 'PROCESSING',
-    },
-  })
-
   try {
-    const response = await fetch(
-      file.url,
-      {
-        headers: {
-          'Content-Type': 'application/pdf',
-        }
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`)
-    }
-
-    const blob = await response.blob()
-
-    const loader = new PDFLoader(blob, {
-      splitPages: false
-    })
-
-    const docs = await loader.load()
-    
-    // Get the raw text content
-    const rawText = docs[0].pageContent
-    
-    // Use text splitter to count actual pages (based on form feeds)
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200
-    })
-    
-    const splitDocs = await textSplitter.splitDocuments(docs)
-    console.log('Actual document chunks:', splitDocs.length)
-
-    // vectorize and index entire document
-    const pinecone = getPineconeClient()
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY,
+    const createdFile = await db.file.create({
+      data: {
+        key: file.key,
+        name: file.name,
+        userId: metadata.userId,
+        url: file.url,
+        uploadStatus: 'PROCESSING',
+      },
     })
 
     try {
-      // Create embeddings in smaller batches
-      const batchSize = 10
-      for (let i = 0; i < splitDocs.length; i += batchSize) {
-        const batch = splitDocs.slice(i, i + batchSize)
-        
-        // Generate embeddings for the batch
-        const vectors = await Promise.all(
-          batch.map(async (doc, idx) => {
-            const embedding = await embeddings.embedQuery(doc.pageContent)
-            const vectorId = `${createdFile.id}-${i + idx}`
-            console.log('Creating vector:', {
-              id: vectorId,
-              metadata: {
-                text: doc.pageContent.slice(0, 100) + '...',
-                fileId: createdFile.id
-              }
-            })
-            return {
-              id: vectorId,
-              values: embedding,
-              metadata: {
-                text: doc.pageContent,
-                fileId: createdFile.id
-              }
-            }
-          })
-        )
+      const response = await fetch(file.url)
+      const blob = await response.blob()
+      const loader = new PDFLoader(blob)
 
-        // Upsert vectors directly to the index
-        await pinecone.index('neurosage').upsert(vectors)
-        console.log(`Processed and uploaded batch ${i / batchSize + 1} of ${Math.ceil(splitDocs.length / batchSize)}`)
+      const pageLevelDocs = await loader.load()
+
+      const textSplitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,
+        chunkOverlap: 200,
+      })
+
+      const splitDocs = await textSplitter.splitDocuments(pageLevelDocs)
+
+      const embeddings = new OpenAIEmbeddings({
+        openAIApiKey: process.env.OPENAI_API_KEY,
+      })
+
+      const pinecone = getPineconeClient()
+      const index = pinecone.Index('neurosage')
+
+      // Prepare vectors array for upsert
+      const vectors = await Promise.all(
+        splitDocs.map(async (doc, i) => {
+          const embedding = await embeddings.embedQuery(doc.pageContent)
+          return {
+            id: `${createdFile.id}-${i}`,
+            values: embedding,
+            metadata: {
+              text: doc.pageContent,
+              fileId: createdFile.id,
+            },
+          }
+        })
+      )
+
+      // Upsert in batches of 100
+      const batchSize = 100
+      for (let i = 0; i < vectors.length; i += batchSize) {
+        const batch = vectors.slice(i, i + batchSize)
+        await index.upsert(batch)
       }
 
       await db.file.update({
@@ -130,42 +92,30 @@ const onUploadComplete = async ({
           uploadStatus: 'SUCCESS',
         },
         where: {
-          id: createdFile.id,
-        },
+          id: createdFile.id
+        }
       })
-    } catch (error: any) {
-      console.error('Error details:', {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        response: error?.response,
-        stack: error?.stack,
-      })
-      
+    } catch (err) {
+      console.error('Error processing file:', err)
       await db.file.update({
         data: {
           uploadStatus: 'FAILED',
         },
         where: {
-          id: createdFile.id,
-        },
+          id: createdFile.id
+        }
       })
-      throw error
     }
   } catch (err) {
-    console.error('Error processing file:', err)
-    await db.file.update({
-      data: {
-        uploadStatus: 'FAILED',
-      },
-      where: {
-        id: createdFile.id,
-      },
-    })
+    console.error('Error in upload complete handler:', err)
   }
 }
 
 export const ourFileRouter = {
-  pdfUploader: f({ pdf: { maxFileSize: '16MB' } })
+  freePlanUploader: f({ pdf: { maxFileSize: '32MB' } })
+    .middleware(middleware)
+    .onUploadComplete(onUploadComplete),
+  proPlanUploader: f({ pdf: { maxFileSize: '32MB' } })
     .middleware(middleware)
     .onUploadComplete(onUploadComplete),
 } satisfies FileRouter

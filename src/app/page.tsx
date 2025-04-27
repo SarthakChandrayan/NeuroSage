@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Upload, Brain, MessageSquare } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
 import '../styles/landing.css'
+import PDFPreviewAnimation from '@/components/PDFPreviewAnimation'
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
           <p className="text-base font-semibold title-text">
             NeuroSage is now public!
           </p>
+          
         </div>
         <h1 className="max-w-4xl text-4xl font-bold md:text-5xl lg:text-6xl">
           Chat with your <span className="gradient-text">documents</span> in seconds.
@@ -31,123 +33,140 @@ export default function Home() {
             size: 'lg',
             className: 'mt-5',
           })}
-          href="/dashboard"
-          target="_blank">
+          href="/dashboard">
           Get started <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
       </MaxWidthWrapper>
 
-      {/* Value proposition section */}
-      <div>
-        <div className="relative isolate">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-            <div
-              style={{
-                clipPath:
-                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              }}
-              className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00DC82] to-[#0047E1] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-            />
-          </div>
-
-          <div>
-            <div className="mx-auto max-w-6xl px-6 lg:px-8">
-              <div className="mt-16 flow-root sm:mt-24">
-                <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-                  <Image
-                    src="/dashboard-preview.jpg"
-                    alt="product preview"
-                    width={1364}
-                    height={866}
-                    quality={100}
-                    className="rounded-md bg-white p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-gray-900/10 floating"
-                  />
-                </div>
-              </div>
+      {/* Interactive Preview section */}
+      <div className="relative isolate">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <div className="mt-16 flow-root sm:mt-24">
+            <div className="-m-2 rounded-xl lg:-m-4 lg:rounded-2xl lg:p-4">
+              <PDFPreviewAnimation />
             </div>
-          </div>
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-            <div
-              style={{
-                clipPath:
-                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              }}
-              className="relative left-[calc(50%-13rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#0047E1] to-[#00DC82] opacity-30 sm:left-[calc(50%-36rem)] sm:w-[72.1875rem]"
-            />
           </div>
         </div>
       </div>
 
-      {/* Feature section */}
-      <div className="mx-auto mb-32 mt-32 max-w-5xl sm:mt-56">
-        <div className="mb-12 px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="mt-2 font-bold text-4xl text-gray-900 sm:text-5xl">
-              Start chatting in minutes
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Chatting with your PDF documents has never been
-              easier than with NeuroSage.
-            </p>
+      {/* Features Section */}
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 mt-24">
+        <h2 className="text-3xl font-bold text-center mb-12 gradient-text">Why Choose NeuroSage?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="feature-gradient-1 p-6 rounded-2xl">
+            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
+              <Upload className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Easy Upload</h3>
+            <p className="text-gray-400">Upload your PDF documents with a simple drag and drop interface.</p>
+          </div>
+          <div className="feature-gradient-2 p-6 rounded-2xl">
+            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
+              <Brain className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">AI Analysis</h3>
+            <p className="text-gray-400">Advanced AI processes your documents for meaningful insights.</p>
+          </div>
+          <div className="feature-gradient-3 p-6 rounded-2xl">
+            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
+              <MessageSquare className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Interactive Chat</h3>
+            <p className="text-gray-400">Chat with your documents and get instant, accurate responses.</p>
           </div>
         </div>
+      </div>
 
-        {/* steps */}
-        <ol className="my-8 space-y-4 pt-8 md:flex md:space-x-12 md:space-y-0">
-          <li className="md:flex-1 feature-gradient-1 rounded-lg p-8">
-            <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pl-0 md:pt-4">
-              <span className="text-sm font-medium text-blue-600">
-                Step 1
-              </span>
-              <span className="text-xl font-semibold">
-                Sign up for an account
-              </span>
-              <span className="mt-2 text-zinc-700">
-                Either starting out with a free plan or
-                choose our{' '}
-                <Link
-                  href="/pricing"
-                  className="text-blue-700 underline underline-offset-2">
-                  pro plan
-                </Link>
-                .
-              </span>
-            </div>
-          </li>
-          <li className="md:flex-1 feature-gradient-2 rounded-lg p-8">
-            <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pl-0 md:pt-4">
-              <span className="text-sm font-medium text-blue-600">
-                Step 2
-              </span>
-              <span className="text-xl font-semibold">
-                Upload your PDF file
-              </span>
-              <span className="mt-2 text-zinc-700">
-                We&apos;ll process your file and make it
-                ready for you to chat with.
-              </span>
-            </div>
-          </li>
-          <li className="md:flex-1 feature-gradient-3 rounded-lg p-8">
-            <div className="flex flex-col space-y-2 border-l-4 border-zinc-300 py-2 pl-4 md:border-l-0 md:border-t-2 md:pb-0 md:pl-0 md:pt-4">
-              <span className="text-sm font-medium text-blue-600">
-                Step 3
-              </span>
-              <span className="text-xl font-semibold">
-                Start asking questions
-              </span>
-              <span className="mt-2 text-zinc-700">
-                It&apos;s that simple. Try out NeuroSage today -
-                it really takes less than a minute.
-              </span>
-            </div>
-          </li>
-        </ol>
+      {/* Team Section */}
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 py-24">
+        <h2 className="text-4xl font-bold text-center mb-16">
+          <span className="gradient-text">Meet the Team</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Team Member 1 */}
+          <div className="group flex flex-col items-center text-center p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/30 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <h3 className="relative text-xl font-bold whitespace-nowrap">
+              <span className="gradient-text">Akshat Kumar Sharma</span>
+            </h3>
+            <Link 
+              href="https://www.linkedin.com/in/akshat-kumar-sharma-a54669247/"
+              target="_blank"
+              className="mt-6 relative transform group-hover:scale-110 transition-transform duration-300"
+            >
+              <Image 
+                src="/linkedin.png" 
+                alt="LinkedIn" 
+                width={40} 
+                height={40} 
+                className="drop-shadow-lg"
+              />
+            </Link>
+          </div>
+
+          {/* Team Member 2 */}
+          <div className="group flex flex-col items-center text-center p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/30 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <h3 className="relative text-xl font-bold whitespace-nowrap">
+              <span className="gradient-text">Sarthak Chandrayan</span>
+            </h3>
+            <Link 
+              href="https://www.linkedin.com/in/sarthak-chandrayan-98a755159/"
+              target="_blank"
+              className="mt-6 relative transform group-hover:scale-110 transition-transform duration-300"
+            >
+              <Image 
+                src="/linkedin.png" 
+                alt="LinkedIn" 
+                width={40} 
+                height={40} 
+                className="drop-shadow-lg"
+              />
+            </Link>
+          </div>
+
+          {/* Team Member 3 */}
+          <div className="group flex flex-col items-center text-center p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/30 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <h3 className="relative text-xl font-bold whitespace-nowrap">
+              <span className="gradient-text">Agresh Prakash</span>
+            </h3>
+            <Link 
+              href="https://www.linkedin.com/in/agresh-prakash-2706a121b/"
+              target="_blank"
+              className="mt-6 relative transform group-hover:scale-110 transition-transform duration-300"
+            >
+              <Image 
+                src="/linkedin.png" 
+                alt="LinkedIn" 
+                width={40} 
+                height={40} 
+                className="drop-shadow-lg"
+              />
+            </Link>
+          </div>
+
+          {/* Team Member 4 */}
+          <div className="group flex flex-col items-center text-center p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/30 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <h3 className="relative text-xl font-bold whitespace-nowrap">
+              <span className="gradient-text">Lokesh Kumar Sinha</span>
+            </h3>
+            <Link 
+              href="https://www.linkedin.com/in/lokesh-kumar-sinha-bb09b721b/"
+              target="_blank"
+              className="mt-6 relative transform group-hover:scale-110 transition-transform duration-300"
+            >
+              <Image 
+                src="/linkedin.png" 
+                alt="LinkedIn" 
+                width={40} 
+                height={40} 
+                className="drop-shadow-lg"
+              />
+            </Link>
+          </div>
+        </div>
       </div>
     </>
   )
