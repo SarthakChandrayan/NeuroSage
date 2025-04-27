@@ -7,7 +7,6 @@ import {
 
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
-import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { getPineconeClient } from '@/lib/pinecone'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
@@ -45,18 +44,28 @@ const onUploadComplete = async ({
     })
 
     try {
+      // Download the file
       const response = await fetch(file.url)
+      if (!response.ok) throw new Error('Failed to download PDF')
+      
       const blob = await response.blob()
+      
+      // Load PDF directly from blob
       const loader = new PDFLoader(blob)
-
-      const pageLevelDocs = await loader.load()
+      const pages = await loader.load()
+      
+      // Update total pages
+      await db.file.update({
+        where: { id: createdFile.id },
+        data: { totalPages: pages.length }
+      })
 
       const textSplitter = new RecursiveCharacterTextSplitter({
         chunkSize: 1000,
         chunkOverlap: 200,
       })
 
-      const splitDocs = await textSplitter.splitDocuments(pageLevelDocs)
+      const splitDocs = await textSplitter.splitDocuments(pages)
 
       const embeddings = new OpenAIEmbeddings({
         openAIApiKey: process.env.OPENAI_API_KEY,
@@ -65,31 +74,45 @@ const onUploadComplete = async ({
       const pinecone = getPineconeClient()
       const index = pinecone.Index('neurosage')
 
-      // Prepare vectors array for upsert
-      const vectors = await Promise.all(
-        splitDocs.map(async (doc, i) => {
-          const embedding = await embeddings.embedQuery(doc.pageContent)
-          return {
-            id: `${createdFile.id}-${i}`,
-            values: embedding,
-            metadata: {
-              text: doc.pageContent,
-              fileId: createdFile.id,
-            },
+      // Process in smaller batches and update progress
+      const batchSize = 50
+      for (let i = 0; i < splitDocs.length; i += batchSize) {
+        const batch = splitDocs.slice(i, i + batchSize)
+        
+        // Create embeddings for this batch
+        const vectors = await Promise.all(
+          batch.map(async (doc, batchIndex) => {
+            const embedding = await embeddings.embedQuery(doc.pageContent)
+            return {
+              id: `${createdFile.id}-${i + batchIndex}`,
+              values: embedding,
+              metadata: {
+                text: doc.pageContent,
+                fileId: createdFile.id,
+              },
+            }
+          })
+        )
+
+        // Upload to Pinecone
+        await index.upsert(vectors)
+
+        // Update progress
+        const progress = Math.min(100, Math.round((i + batchSize) / splitDocs.length * 100))
+        await db.file.update({
+          where: { id: createdFile.id },
+          data: { 
+            pagesProcessed: Math.min(pages.length, Math.floor((i + batchSize) / batchSize)),
+            processingProgress: progress
           }
         })
-      )
-
-      // Upsert in batches of 100
-      const batchSize = 100
-      for (let i = 0; i < vectors.length; i += batchSize) {
-        const batch = vectors.slice(i, i + batchSize)
-        await index.upsert(batch)
       }
 
       await db.file.update({
         data: {
           uploadStatus: 'SUCCESS',
+          processingProgress: 100,
+          pagesProcessed: pages.length
         },
         where: {
           id: createdFile.id
@@ -100,6 +123,7 @@ const onUploadComplete = async ({
       await db.file.update({
         data: {
           uploadStatus: 'FAILED',
+          processingProgress: 0
         },
         where: {
           id: createdFile.id

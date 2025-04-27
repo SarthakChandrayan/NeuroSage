@@ -14,12 +14,16 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { Button } from './ui/button'
 import { useState } from 'react'
+import { Progress } from './ui/progress'
 
 interface FileType {
   id: string
   name: string
   createdAt: string
   uploadStatus: 'PENDING' | 'PROCESSING' | 'FAILED' | 'SUCCESS'
+  processingProgress: number
+  totalPages: number
+  pagesProcessed: number
 }
 
 const Dashboard = () => {
@@ -88,14 +92,21 @@ const Dashboard = () => {
 
                   <div className='flex items-center gap-2'>
                     <MessageSquare className='h-4 w-4' />
-                    mocked
+                    {file.uploadStatus === 'PROCESSING' ? (
+                      <span className='text-yellow-500'>Processing...</span>
+                    ) : file.uploadStatus === 'FAILED' ? (
+                      <span className='text-red-500'>Failed</span>
+                    ) : (
+                      'Ready'
+                    )}
                   </div>
 
                   <Button
                     onClick={() => deleteFile({ id: file.id })}
                     size='sm'
                     className='w-full'
-                    variant='destructive'>
+                    variant='destructive'
+                    disabled={file.uploadStatus === 'PROCESSING'}>
                     {currentlyDeletingFile === file.id ? (
                       <Loader2 className='h-4 w-4 animate-spin' />
                     ) : (
@@ -103,6 +114,19 @@ const Dashboard = () => {
                     )}
                   </Button>
                 </div>
+
+                {file.uploadStatus === 'PROCESSING' && (
+                  <div className='px-6 py-4'>
+                    <div className='flex items-center justify-between mb-2 text-xs text-zinc-500'>
+                      <span>Processing PDF...</span>
+                      <span>{file.processingProgress}%</span>
+                    </div>
+                    <Progress value={file.processingProgress} className='h-1' />
+                    <div className='mt-2 text-xs text-zinc-500 text-center'>
+                      {file.pagesProcessed} of {file.totalPages} pages processed
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
         </ul>

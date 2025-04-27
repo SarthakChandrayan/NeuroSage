@@ -1,3 +1,5 @@
+'use client'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +10,6 @@ import {
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import Image from 'next/image'
-import { Icons } from './Icons'
 import Link from 'next/link'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/server'
 
@@ -18,17 +19,25 @@ interface UserAccountNavProps {
   imageUrl: string
 }
 
-const UserAccountNav = async ({
+const UserAccountNav = ({
   email,
   imageUrl,
   name,
 }: UserAccountNavProps) => {
+  // Get initials for fallback
+  const initials = name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         asChild
         className='overflow-visible'>
-        <Button className='rounded-full h-8 w-8 aspect-square bg-slate-400'>
+        <Button className='rounded-full h-8 w-8 aspect-square bg-slate-100 hover:bg-slate-200'>
           <Avatar className='relative w-8 h-8'>
             {imageUrl ? (
               <div className='relative aspect-square h-full w-full'>
@@ -37,12 +46,12 @@ const UserAccountNav = async ({
                   src={imageUrl}
                   alt='profile picture'
                   referrerPolicy='no-referrer'
+                  className='rounded-full object-cover'
                 />
               </div>
             ) : (
-              <AvatarFallback>
-                <span className='sr-only'>{name}</span>
-                <Icons.user className='h-4 w-4 text-zinc-900' />
+              <AvatarFallback className='bg-primary text-primary-foreground'>
+                <span className='text-sm font-medium'>{initials}</span>
               </AvatarFallback>
             )}
           </Avatar>
@@ -68,13 +77,13 @@ const UserAccountNav = async ({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
-          <Link href='/dashboard'>Dashboard</Link>
+          <Link href='/dashboard' className='cursor-pointer w-full'>Dashboard</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className='cursor-pointer'>
-            <LogoutLink>Log out</LogoutLink>
+        <DropdownMenuItem className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
+          <LogoutLink className='w-full'>Log out</LogoutLink>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
