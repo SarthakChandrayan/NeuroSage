@@ -3,6 +3,7 @@ import {
   createContext,
   useRef,
   useState,
+  useEffect,
 } from 'react'
 import { useToast } from '../ui/use-toast'
 import { useMutation } from '@tanstack/react-query'
@@ -42,6 +43,33 @@ export const ChatContextProvider = ({
   const { toast } = useToast()
 
   const backupMessage = useRef('')
+
+  // Add initial message explaining capabilities
+  useEffect(() => {
+    utils.getFileMessages.setInfiniteData(
+      { fileId, limit: INFINITE_QUERY_LIMIT },
+      (old) => {
+        if (!old || old.pages[0]?.messages.length === 0) {
+          return {
+            pages: [
+              {
+                messages: [
+                  {
+                    createdAt: new Date().toISOString(),
+                    id: 'welcome-message',
+                    text: `👋 Hi! I've analyzed your document and I'm ready to help. What would you like to know about it?`,
+                    isUserMessage: false,
+                  },
+                ],
+              },
+            ],
+            pageParams: [],
+          }
+        }
+        return old
+      }
+    )
+  }, [fileId])
 
   const { mutate: sendMessage } = useMutation({
     mutationFn: async ({

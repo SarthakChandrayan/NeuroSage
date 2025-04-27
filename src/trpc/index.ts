@@ -84,17 +84,35 @@ export const appRouter = router({
   getFileUploadStatus: privateProcedure
     .input(z.object({ fileId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const file = await db.file.findFirst({
+      // Try to find file by ID first
+      let file = await db.file.findFirst({
         where: {
           id: input.fileId,
           userId: ctx.userId,
         },
         select: {
           id: true,
+          key: true,
           uploadStatus: true,
           processingProgress: true,
         },
       })
+
+      // If not found by ID, try by key
+      if (!file) {
+        file = await db.file.findFirst({
+          where: {
+            key: input.fileId,
+            userId: ctx.userId,
+          },
+          select: {
+            id: true,
+            key: true,
+            uploadStatus: true,
+            processingProgress: true,
+          },
+        })
+      }
 
       if (!file) return { 
         status: 'PENDING' as const,

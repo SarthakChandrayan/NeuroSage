@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
-import { ArrowRight, Upload, Brain, MessageSquare } from 'lucide-react'
+import { ArrowRight, Upload, Brain, MessageSquare, CheckCircle, Code, Database } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
 import '../styles/landing.css'
@@ -18,61 +18,121 @@ export default function Home() {
           <p className="text-base font-semibold title-text">
             NeuroSage is now public!
           </p>
-          
         </div>
-        <h1 className="max-w-4xl text-4xl font-bold md:text-5xl lg:text-6xl">
-          Chat with your <span className="gradient-text">documents</span> in seconds.
+        <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
+          Transform Your <span className="gradient-text">Documents</span> into Interactive Knowledge
         </h1>
         <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">
-          NeuroSage allows you to have conversations with any PDF document.
-          Simply upload your file and start asking questions right away.
+          Experience the future of document interaction. Upload any PDF and engage in natural conversations, 
+          get instant insights, and unlock the power of your documents with AI.
         </p>
 
-        <Link
-          className={buttonVariants({
-            size: 'lg',
-            className: 'mt-5',
-          })}
-          href="/dashboard">
-          Get started <ArrowRight className="ml-2 h-5 w-5" />
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <Link
+            className={buttonVariants({
+              size: 'lg',
+              className: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300',
+            })}
+            href="/dashboard">
+            Try It Now <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+          <Link
+            className={buttonVariants({
+              size: 'lg',
+              variant: 'outline',
+              className: 'bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-300',
+            })}
+            href="#tech-stack">
+            Tech Stack
+          </Link>
+        </div>
       </MaxWidthWrapper>
+
+      {/* How It Works Section */}
+      <div id="how-it-works" className="relative py-24 bg-gradient-to-b from-transparent to-white/5">
+        <MaxWidthWrapper>
+          <h2 className="text-4xl font-bold text-center mb-16">
+            <span className="gradient-text">How It Works</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="step-card relative">
+              <div className="absolute -left-4 -top-4 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">1</div>
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 h-full transform hover:scale-105 transition-all duration-300">
+                <Upload className="h-8 w-8 mb-4 text-blue-500" />
+                <h3 className="text-xl font-bold mb-2">Upload Your Document</h3>
+                <p className="text-zinc-600">Simply drag and drop your PDF file into our secure platform.</p>
+              </div>
+            </div>
+            <div className="step-card relative">
+              <div className="absolute -left-4 -top-4 w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold">2</div>
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 h-full transform hover:scale-105 transition-all duration-300">
+                <Brain className="h-8 w-8 mb-4 text-purple-500" />
+                <h3 className="text-xl font-bold mb-2">AI Processing</h3>
+                <p className="text-zinc-600">Our AI analyzes and understands your document's content in seconds.</p>
+              </div>
+            </div>
+            <div className="step-card relative">
+              <div className="absolute -left-4 -top-4 w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">3</div>
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 h-full transform hover:scale-105 transition-all duration-300">
+                <MessageSquare className="h-8 w-8 mb-4 text-indigo-500" />
+                <h3 className="text-xl font-bold mb-2">Start Chatting</h3>
+                <p className="text-zinc-600">Ask questions and get instant, accurate responses from your document.</p>
+              </div>
+            </div>
+          </div>
+        </MaxWidthWrapper>
+      </div>
 
       {/* Interactive Preview section */}
       <div className="relative isolate">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="mt-16 flow-root sm:mt-24">
-            <div className="-m-2 rounded-xl lg:-m-4 lg:rounded-2xl lg:p-4">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mt-24 mb-16 flow-root">
+            <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-inset ring-white/10">
               <PDFPreviewAnimation />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="mx-auto max-w-6xl px-6 lg:px-8 mt-24">
-        <h2 className="text-3xl font-bold text-center mb-12 gradient-text">Why Choose NeuroSage?</h2>
+      {/* Tech Stack Section */}
+      <div id="tech-stack" className="mx-auto max-w-6xl px-6 lg:px-8 mt-24">
+        <h2 className="text-3xl font-bold text-center mb-12 gradient-text">Technology Stack</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="feature-gradient-1 p-6 rounded-2xl">
-            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-              <Upload className="h-6 w-6 text-white" />
+          <div className="feature-card group p-6 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-300">
+            <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Code className="h-6 w-6 text-white" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Easy Upload</h3>
-            <p className="text-gray-400">Upload your PDF documents with a simple drag and drop interface.</p>
+            <h3 className="text-xl font-semibold mb-2">Frontend</h3>
+            <ul className="text-gray-400 text-left list-disc list-inside">
+              <li>Next.js 14</li>
+              <li>TypeScript</li>
+              <li>Tailwind CSS</li>
+              <li>Shadcn UI</li>
+            </ul>
           </div>
-          <div className="feature-gradient-2 p-6 rounded-2xl">
-            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
+          <div className="feature-card group p-6 rounded-2xl bg-gradient-to-br from-purple-600/10 to-indigo-600/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-300">
+            <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
               <Brain className="h-6 w-6 text-white" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">AI Analysis</h3>
-            <p className="text-gray-400">Advanced AI processes your documents for meaningful insights.</p>
+            <h3 className="text-xl font-semibold mb-2">AI & ML</h3>
+            <ul className="text-gray-400 text-left list-disc list-inside">
+              <li>OpenAI GPT-4</li>
+              <li>LangChain</li>
+              <li>Vector Embeddings</li>
+              <li>PDF Processing</li>
+            </ul>
           </div>
-          <div className="feature-gradient-3 p-6 rounded-2xl">
-            <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-              <MessageSquare className="h-6 w-6 text-white" />
+          <div className="feature-card group p-6 rounded-2xl bg-gradient-to-br from-indigo-600/10 to-blue-600/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-300">
+            <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Database className="h-6 w-6 text-white" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Interactive Chat</h3>
-            <p className="text-gray-400">Chat with your documents and get instant, accurate responses.</p>
+            <h3 className="text-xl font-semibold mb-2">Backend & Storage</h3>
+            <ul className="text-gray-400 text-left list-disc list-inside">
+              <li>Pinecone Vector DB</li>
+              <li>Uploadthing</li>
+              <li>Kinde Auth</li>
+              <li>Prisma ORM</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -80,7 +140,7 @@ export default function Home() {
       {/* Team Section */}
       <div className="mx-auto max-w-6xl px-6 lg:px-8 py-24">
         <h2 className="text-4xl font-bold text-center mb-16">
-          <span className="gradient-text">Meet the Team</span>
+          <span className="gradient-text">The Team</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Team Member 1 */}
@@ -99,7 +159,7 @@ export default function Home() {
                 alt="LinkedIn" 
                 width={40} 
                 height={40} 
-                className="drop-shadow-lg"
+                className="drop-shadow-lg hover:brightness-110"
               />
             </Link>
           </div>
@@ -120,7 +180,7 @@ export default function Home() {
                 alt="LinkedIn" 
                 width={40} 
                 height={40} 
-                className="drop-shadow-lg"
+                className="drop-shadow-lg hover:brightness-110"
               />
             </Link>
           </div>
@@ -141,7 +201,7 @@ export default function Home() {
                 alt="LinkedIn" 
                 width={40} 
                 height={40} 
-                className="drop-shadow-lg"
+                className="drop-shadow-lg hover:brightness-110"
               />
             </Link>
           </div>
@@ -162,7 +222,7 @@ export default function Home() {
                 alt="LinkedIn" 
                 width={40} 
                 height={40} 
-                className="drop-shadow-lg"
+                className="drop-shadow-lg hover:brightness-110"
               />
             </Link>
           </div>
