@@ -13,6 +13,14 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
   const pathname = usePathname()
 
   useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+  }, [isOpen])
+
+  useEffect(() => {
     if (isOpen) toggleOpen()
   }, [pathname])
 

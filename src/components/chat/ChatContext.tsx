@@ -55,21 +55,25 @@ export const ChatContextProvider = ({
               {
                 messages: [
                   {
-                    createdAt: new Date().toISOString(),
                     id: 'welcome-message',
                     text: `👋 Hi! I've analyzed your document and I'm ready to help. What would you like to know about it?`,
                     isUserMessage: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    userId: 'system',
+                    fileId
                   },
                 ],
+                nextCursor: undefined
               },
             ],
-            pageParams: [],
+            pageParams: []
           }
         }
         return old
       }
     )
-  }, [fileId])
+  }, [fileId, utils.getFileMessages])
 
   const { mutate: sendMessage } = useMutation({
     mutationFn: async ({
@@ -120,9 +124,12 @@ export const ChatContextProvider = ({
           latestPage.messages = [
             {
               createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
               id: crypto.randomUUID(),
               text: message,
               isUserMessage: true,
+              userId: 'user',
+              fileId
             },
             ...latestPage.messages,
           ]
@@ -193,9 +200,12 @@ export const ChatContextProvider = ({
                   updatedMessages = [
                     {
                       createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString(),
                       id: 'ai-response',
                       text: accResponse,
                       isUserMessage: false,
+                      userId: 'ai',
+                      fileId
                     },
                     ...page.messages,
                   ]
@@ -231,7 +241,7 @@ export const ChatContextProvider = ({
     onError: (_, __, context) => {
       setMessage(backupMessage.current)
       utils.getFileMessages.setData(
-        { fileId },
+        { fileId, limit: INFINITE_QUERY_LIMIT },
         { messages: context?.previousMessages ?? [] }
       )
     },

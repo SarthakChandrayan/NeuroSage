@@ -34,6 +34,7 @@ const Messages = ({ fileId }: MessagesProps) => {
 
   const loadingMessage = {
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     id: 'loading-message',
     isUserMessage: false,
     text: (
@@ -41,6 +42,8 @@ const Messages = ({ fileId }: MessagesProps) => {
         <Loader2 className='h-4 w-4 animate-spin' />
       </span>
     ),
+    userId: 'system',
+    fileId
   }
 
   const combinedMessages = [

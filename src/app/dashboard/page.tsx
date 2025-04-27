@@ -3,11 +3,15 @@ import { redirect } from 'next/navigation'
 import Dashboard from '@/components/Dashboard'
 import Analytics from '@/components/Analytics'
 
+export const dynamic = 'force-dynamic'
+
 const Page = async () => {
   const { getUser } = getKindeServerSession()
   const user = await getUser()
 
-  if (!user || !user.id) redirect('/auth-callback?origin=dashboard')
+  if (!user || !user.id) {
+    redirect('/auth-callback?origin=dashboard')
+  }
 
   return (
     <main className='mx-auto max-w-7xl md:p-10'>

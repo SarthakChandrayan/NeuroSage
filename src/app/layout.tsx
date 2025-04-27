@@ -20,17 +20,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en' className='light'>
-      <Providers>
-        <body
-          className={cn(
-            'min-h-screen font-sans antialiased grainy',
-            inter.className
-          )}>
+      <body
+        className={cn(
+          'min-h-screen font-sans antialiased grainy',
+          inter.className
+        )}>
+        <Providers>
           <Toaster />
           <Navbar />
           {children}
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }

@@ -18,7 +18,7 @@ import { useState } from 'react'
 interface FileType {
   id: string
   name: string
-  createdAt: Date
+  createdAt: string
   uploadStatus: 'PENDING' | 'PROCESSING' | 'FAILED' | 'SUCCESS'
 }
 
@@ -49,7 +49,7 @@ const Dashboard = () => {
           My Files
         </h1>
 
-        <UploadButton />
+        <UploadButton isSubscribed={false} />
       </div>
 
       {/* Display all user files */}
@@ -57,11 +57,11 @@ const Dashboard = () => {
         <ul className='mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
           {files
             .sort(
-              (a: FileType, b: FileType) =>
+              (a, b) =>
                 new Date(b.createdAt).getTime() -
                 new Date(a.createdAt).getTime()
             )
-            .map((file: FileType) => (
+            .map((file) => (
               <li
                 key={file.id}
                 className='col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg'>
@@ -120,7 +120,7 @@ const Dashboard = () => {
             Upload your first PDF to start chatting with your documents.
           </p>
           <div className='mt-4'>
-            <UploadButton />
+            <UploadButton isSubscribed={false} />
           </div>
         </div>
       )}

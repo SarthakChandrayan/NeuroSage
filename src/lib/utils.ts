@@ -10,9 +10,8 @@ export function absoluteUrl(path: string) {
   if (typeof window !== 'undefined') return path
   if (process.env.VERCEL_URL)
     return `https://${process.env.VERCEL_URL}${path}`
-  return `http://localhost:${
-    process.env.PORT ?? 3000
-  }${path}`
+  const port = process.env.PORT || 3000
+  return `http://localhost:${port}${path}`
 }
 
 export function constructMetadata({

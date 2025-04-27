@@ -15,6 +15,7 @@ const Providers = ({ children }: PropsWithChildren) => {
       queries: {
         refetchOnWindowFocus: false,
         retry: 3,
+        staleTime: 5 * 1000,
       },
       mutations: {
         retry: 3,
@@ -22,20 +23,19 @@ const Providers = ({ children }: PropsWithChildren) => {
     },
   }))
 
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
+  const [trpcClient] = useState(() => {
+    const url = absoluteUrl('/api/trpc')
+    return trpc.createClient({
       links: [
         httpBatchLink({
-          url: absoluteUrl('/api/trpc'),
-          headers() {
-            return {
-              'x-trpc-source': 'react',
-            }
-          },
+          url,
+          headers: () => ({
+            'x-trpc-source': 'react',
+          }),
         }),
       ],
     })
-  )
+  })
 
   return (
     <trpc.Provider

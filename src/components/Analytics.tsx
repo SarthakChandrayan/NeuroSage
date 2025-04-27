@@ -15,11 +15,18 @@ import { format } from 'date-fns'
 import { type ExtendedMessage } from '@/types/message'
 
 const Analytics = () => {
-  const { data: files } = trpc.getUserFiles.useQuery()
-  const { data: messages } = trpc.getFileMessages.useQuery({
-    fileId: files?.[0]?.id ?? '',
-    limit: 100,
-  })
+  const { data: files, isLoading: isLoadingFiles } = trpc.getUserFiles.useQuery()
+  
+  const firstFileId = files?.[0]?.id
+  const { data: messages, isLoading: isLoadingMessages } = trpc.getFileMessages.useQuery(
+    {
+      fileId: firstFileId || 'dummy-id', // Use a dummy ID that won't match any real files
+      limit: 100,
+    },
+    {
+      enabled: !!firstFileId, // Only run query when we have a real file ID
+    }
+  )
 
   // Prepare data for charts
   const messagesByDate = messages?.messages?.reduce((acc: Record<string, number>, message: ExtendedMessage) => {
@@ -29,12 +36,27 @@ const Analytics = () => {
     }
     acc[date]++
     return acc
-  }, {})
+  }, {}) || {}
 
-  const chartData = Object.entries(messagesByDate || {}).map(([date, count]) => ({
+  const chartData = Object.entries(messagesByDate).map(([date, count]) => ({
     date,
     messages: count,
   }))
+
+  const isLoading = isLoadingFiles || isLoadingMessages
+
+  if (isLoading) {
+    return (
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+        <Card className='lg:col-span-4'>
+          <CardHeader>
+            <CardTitle>Document Analytics</CardTitle>
+            <CardDescription>Loading...</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>

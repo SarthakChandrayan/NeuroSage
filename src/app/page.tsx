@@ -68,7 +68,7 @@ export default function Home() {
               <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 h-full transform hover:scale-105 transition-all duration-300">
                 <Brain className="h-8 w-8 mb-4 text-purple-500" />
                 <h3 className="text-xl font-bold mb-2">AI Processing</h3>
-                <p className="text-zinc-600">Our AI analyzes and understands your document's content in seconds.</p>
+                <p className="text-zinc-600">Our AI analyzes and understands your document&apos;s content in seconds.</p>
               </div>
             </div>
             <div className="step-card relative">
