@@ -116,7 +116,7 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-semibold mb-2">AI & ML</h3>
             <ul className="text-gray-400 text-left list-disc list-inside">
-              <li>OpenAI GPT-4</li>
+              <li>Open Source Models</li>
               <li>LangChain</li>
               <li>Vector Embeddings</li>
               <li>PDF Processing</li>
